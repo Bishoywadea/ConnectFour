@@ -113,15 +113,6 @@ class Main:
 
     def draw(self):
         g.WIN.fill(g.BLACK)
-        heading_w = self.heading.get_width()
-        heading_h = self.heading.get_height()
-        heading_rect = (
-            (g.WIDTH - heading_w) // 2,
-            (g.HEIGHT * 0.5 - g.FRAME_GAP * g.GRID_ROWS/2 - heading_h) // 2,
-        )
-        g.WIN.blit(
-            self.heading, heading_rect
-        )
         tt_width = self.turn_text.get_width()
         tt_height = self.turn_text.get_height()
         tt_rect = (
@@ -193,11 +184,7 @@ class Main:
                 break
         g.init()
         pg.font.init()
-        self.heading = pg.font.Font(None, 96).render(
-            _("Connect Four"),
-            True,
-            g.WHITE
-        )
+        
         self.reset_text = pg.font.Font(None, 56).render(
             _("Reset"),
             True,
