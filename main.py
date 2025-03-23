@@ -1,5 +1,3 @@
-# main.py modifications
-
 import pygame as pg
 from anim import Animate
 import g
@@ -21,6 +19,12 @@ class Main:
         self.canvas = None
         self.score = [0, 0]
         self.show_help = False
+        self.help_pos = None
+        self.close_text = None
+        self.question_text = None
+        self.help_text = []
+        self.turn_text = None
+        self.reset_rect = None
 
     def set_canvas(self, canvas):
         self.canvas = canvas
@@ -59,13 +63,16 @@ class Main:
                     self.score = [0, 0]
 
     def draw_help(self):
+        # Draw the help button
         pg.draw.circle(
             g.WIN,
             g.GREY,
             self.help_pos.center,
             40,
         )
+        
         if self.show_help:
+            # Draw the X button to close help
             width = self.close_text.get_width()
             height = self.close_text.get_height()
             close_rect = (
@@ -75,32 +82,46 @@ class Main:
             g.WIN.blit(
                 self.close_text, close_rect
             )
+            
+            # Calculate the dimensions for help panel based on text content
+            max_text_width = max(text.get_width() for text in self.help_text)
+            total_text_height = sum(text.get_height() for text in self.help_text)
+            spacing = 40  # Space between lines
+            
+            # Calculate padding
+            horizontal_padding = 50
+            vertical_padding = 60
+            
+            # Calculate help panel dimensions
+            help_width = max_text_width + (horizontal_padding * 2)
+            help_height = total_text_height + ((len(self.help_text) - 1) * spacing) + (vertical_padding * 2)
+            
+            # Center the help panel
+            help_x = (g.WIDTH - help_width) // 2
+            help_y = (g.HEIGHT - help_height) // 2
+            
+            # Draw the help panel background
             pg.draw.rect(
                 g.WIN,
                 g.GREY,
                 pg.Rect(
-                    50,
-                    (g.HEIGHT - g.FRAME_GAP * g.GRID_ROWS) // 2 - 10,
-                    g.WIDTH - 100,
-                    g.FRAME_GAP * g.GRID_ROWS + 20,
+                    help_x,
+                    help_y,
+                    help_width,
+                    help_height,
                 ),
+                border_radius=15  # Optional: rounded corners
             )
-            g.WIN.blit(
-                self.help_img,
-                (
-                    (g.WIDTH - self.help_img.get_width()) // 2,
-                    (g.HEIGHT - g.FRAME_GAP * g.GRID_ROWS) // 2,
-                ),
-            )
-            for i, text in enumerate(self.help_text):
-                g.WIN.blit(
-                    text,
-                    (
-                        (g.WIDTH - text.get_width()) // 2,
-                        g.HEIGHT // 2 + 40 + 40 * i,
-                    ),
-                )
+            
+            # Draw each line of help text
+            y_offset = help_y + vertical_padding
+            for text in self.help_text:
+                text_x = (g.WIDTH - text.get_width()) // 2
+                g.WIN.blit(text, (text_x, y_offset))
+                y_offset += text.get_height() + spacing
+                
         else:
+            # Draw the question mark when help is not shown
             width = self.question_text.get_width()
             height = self.question_text.get_height()
             question_rect = (
@@ -113,6 +134,7 @@ class Main:
 
     def draw(self):
         g.WIN.fill(g.BLACK)
+        
         tt_width = self.turn_text.get_width()
         tt_height = self.turn_text.get_height()
         tt_rect = (
@@ -142,7 +164,7 @@ class Main:
                 (g.HEIGHT / 2 + g.FRAME_GAP / 4),
             ),
         )
-        # self.draw_help()
+        self.draw_help()
         pg.draw.rect(g.WIN, g.GREY, self.reset_rect)
         pg.draw.circle(
             g.WIN,
@@ -192,6 +214,8 @@ class Main:
         )
         self.question_text = pg.font.Font(None, 72).render("?", True, g.WHITE)
         self.close_text = pg.font.Font(None, 64).render("X", True, g.WHITE)
+        
+        # Create help text renderings
         self.help_text = [
             pg.font.Font(None, 36).render(
                 i,
@@ -205,6 +229,8 @@ class Main:
                 _("vertically, or diagonally) wins the game!"),
             )
         ]
+        
+        # Set up positions and rectangles
         self.help_pos = pg.Rect(
             (3 * g.WIDTH + g.FRAME_GAP * g.GRID_COLS) // 4 - 40,
             (g.HEIGHT * 0.5 - g.FRAME_GAP * g.GRID_ROWS/2) // 2 - 40,
@@ -217,6 +243,8 @@ class Main:
             self.reset_text.get_width(),
             self.reset_text.get_height() + 20,
         )
+        
+        # Font and animation objects
         self.font = pg.font.Font(None, 72)
         self.circle_orange = Animate(self, color=g.ORANGE).circle(
             (
@@ -234,6 +262,9 @@ class Main:
             30,
             0  # Filled circle
         )
+        
+        # Initialize turn text
+        self.turn_text = pg.font.Font(None, 64).render(_("Red Turn"), True, g.WHITE)
 
         if self.canvas is not None:
             self.canvas.grab_focus()
@@ -258,4 +289,4 @@ class Main:
 if __name__ == "__main__":
     pg.init()
     pg.display.set_mode((1024, 768))
-    main
+    Main().run()
