@@ -63,25 +63,7 @@ class Main:
                     self.score = [0, 0]
 
     def draw_help(self):
-        # Draw the help button
-        pg.draw.circle(
-            g.WIN,
-            g.GREY,
-            self.help_pos.center,
-            40,
-        )
-        
         if self.show_help:
-            # Draw the X button to close help
-            width = self.close_text.get_width()
-            height = self.close_text.get_height()
-            close_rect = (
-                (3 * g.WIDTH + g.FRAME_GAP * g.GRID_COLS - 2 * width) // 4,
-                (g.HEIGHT * 0.5 - g.FRAME_GAP * g.GRID_ROWS/2 - height) // 2
-            )
-            g.WIN.blit(
-                self.close_text, close_rect
-            )
             
             # Calculate the dimensions for help panel based on text content
             max_text_width = max(text.get_width() for text in self.help_text)
@@ -119,18 +101,6 @@ class Main:
                 text_x = (g.WIDTH - text.get_width()) // 2
                 g.WIN.blit(text, (text_x, y_offset))
                 y_offset += text.get_height() + spacing
-                
-        else:
-            # Draw the question mark when help is not shown
-            width = self.question_text.get_width()
-            height = self.question_text.get_height()
-            question_rect = (
-                (3 * g.WIDTH + g.FRAME_GAP * g.GRID_COLS - 2 * width) // 4,
-                (g.HEIGHT * 0.5 - g.FRAME_GAP * g.GRID_ROWS/2 - height) // 2
-            )
-            g.WIN.blit(
-                self.question_text, question_rect
-            )
 
     def draw(self):
         g.WIN.fill(g.BLACK)
@@ -200,6 +170,10 @@ class Main:
 
     # The main loop
     def run(self):
+        if not pg.get_init():
+            pg.init()
+        if not pg.font.get_init():
+            pg.font.init()
         for event in pg.event.get():
             if event.type == pg.VIDEORESIZE:
                 pg.display.set_mode(event.size, pg.RESIZABLE)

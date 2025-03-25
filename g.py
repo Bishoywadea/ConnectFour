@@ -23,4 +23,8 @@ GRID_COLS = 7                 # Connect Four is 7 columns
 def init():
     global WIN, WIDTH, HEIGHT
     WIN = pg.display.get_surface()
+    if WIN is None:
+        WIN = pg.display.get_surface()
+    if WIN is not None:
+        WIDTH, HEIGHT = WIN.get_size()
     WIDTH, HEIGHT = WIN.get_size()

@@ -30,7 +30,8 @@ from sugar3.activity.activity import Activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
-
+from sugar3.activity.widgets import ToolButton
+import g
 
 import sugargame.canvas
 
@@ -50,11 +51,14 @@ class ConnectFour(Activity):
         self._pygamecanvas = sugargame.canvas.PygameCanvas(
             self, main=self.game.run, modules=[pygame.display]
         )
-        self.game.set_canvas(self._pygamecanvas)
-
-        # Note that set_canvas implicitly calls read_file when
-        # resuming from the Journal.
         self.set_canvas(self._pygamecanvas)
+        self.game.set_canvas(self._pygamecanvas)
+        
+        # Now initialize pygame and g module
+        pygame.init()
+        g.WIN = pygame.display.get_surface()
+        g.init()
+        
         self._pygamecanvas.grab_focus()
 
     def build_toolbar(self):
@@ -65,6 +69,13 @@ class ConnectFour(Activity):
         activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(activity_button, -1)
         activity_button.show()
+
+        help_button = ToolButton('toolbar-help')
+        help_button.set_tooltip(('How To Play'))
+        # Modify this line:
+        help_button.connect('clicked', self._help_cb)  # Connect to callback function
+        toolbar_box.toolbar.insert(help_button, -1)
+        help_button.show()
 
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = False
@@ -85,3 +96,6 @@ class ConnectFour(Activity):
 
     def close(self):
         self.game.quit()
+
+    def _help_cb(self, button):
+        self.game.show_help = not self.game.show_help
